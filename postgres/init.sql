@@ -123,7 +123,7 @@ CREATE TABLE cves (
     is_kev          BOOLEAN NOT NULL DEFAULT FALSE,
     kev_date_added  DATE,
     cwe             TEXT[],
-    references      JSONB,
+    cve_references  JSONB,
     published_at    TIMESTAMPTZ,
     modified_at     TIMESTAMPTZ,
     enriched_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
