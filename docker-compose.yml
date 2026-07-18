@@ -141,7 +141,7 @@ services:
     container_name: argus-auth
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://:${REDIS_PASSWORD}@falkordb:6379/0
       JWT_SECRET: ${JWT_SECRET}
       BCRYPT_COST: "12"
