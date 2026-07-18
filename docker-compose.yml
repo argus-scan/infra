@@ -196,6 +196,31 @@ services:
       - "traefik.http.routers.scan-orchestrator.service=scan-orchestrator"
       - "traefik.http.services.scan-orchestrator.loadbalancer.server.port=8002"
 
+  port-scanner:
+    image: ghcr.io/argus-scan/port-scanner:latest
+    container_name: argus-port-scanner
+    restart: unless-stopped
+    ports:
+      - "8005:8005"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      PORT: "8005"
+      SCAN_TIMEOUT: "2.0"
+      SCAN_CONCURRENCY: "200"
+    networks:
+      - argus-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8005/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   asset-discovery:
     image: ghcr.io/argus-scan/asset-discovery:latest
     container_name: argus-asset-discovery
