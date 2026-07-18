@@ -73,7 +73,7 @@ services:
     networks:
       - argus-net
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:9200/_cluster/health | grep -qv '\"status\":\"red\"'"]
+      test: ["CMD-SHELL", "curl -sf -u admin:${OPENSEARCH_INITIAL_ADMIN_PASSWORD} http://localhost:9200/_cluster/health | grep -qv '\"status\":\"red\"'"]
       interval: 20s
       timeout: 10s
       retries: 5
