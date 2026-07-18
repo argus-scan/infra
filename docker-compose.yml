@@ -297,8 +297,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NEXT_PUBLIC_AUTH_URL: ${NEXT_PUBLIC_AUTH_URL:-http://localhost:8001}
-      NEXT_PUBLIC_SCAN_URL: ${NEXT_PUBLIC_SCAN_URL:-http://localhost:8002}
+      AUTH_URL: http://auth-service:8001
+      SCAN_URL: http://scan-orchestrator:8002
     networks:
       - argus-net
     healthcheck:
