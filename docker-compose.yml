@@ -136,6 +136,35 @@ services:
       - "traefik.http.routers.minio-console.service=minio-console"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
 
+  auth-service:
+    image: ghcr.io/argus-scan/auth-service:latest
+    container_name: argus-auth
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      REDIS_URL: redis://:${REDIS_PASSWORD}@falkordb:6379/0
+      JWT_SECRET: ${JWT_SECRET}
+      BCRYPT_COST: "12"
+      PORT: "8001"
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-*}
+    networks:
+      - argus-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      falkordb:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health | grep -q ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=PathPrefix(`/auth`)"
+      - "traefik.http.routers.auth.service=auth"
+      - "traefik.http.services.auth.loadbalancer.server.port=8001"
+
 volumes:
   postgres-data:
   falkordb-data:
