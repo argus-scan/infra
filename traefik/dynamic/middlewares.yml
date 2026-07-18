@@ -1,0 +1,44 @@
+http:
+  middlewares:
+    auth:
+      basicAuth:
+        usersFile: /etc/traefik/dynamic/.htpasswd
+
+    rate-limit:
+      rateLimit:
+        average: 100
+        burst: 50
+
+    secure-headers:
+      headers:
+        sslRedirect: true
+        forceSTSHeader: true
+        stsSeconds: 31536000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        frameDeny: true
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=()"
+        customResponseHeaders:
+          X-Powered-By: ""
+          Server: ""
+
+    cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Authorization
+          - Content-Type
+          - X-Tenant-ID
+        accessControlAllowOriginList:
+          - "https://argus.io"
+          - "https://app.argus.io"
+        accessControlMaxAge: 86400
