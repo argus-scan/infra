@@ -290,6 +290,23 @@ services:
       timeout: 5s
       retries: 5
 
+  web:
+    image: ghcr.io/argus-scan/web:latest
+    container_name: argus-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_AUTH_URL: http://${EC2_HOST}:8001
+      NEXT_PUBLIC_SCAN_URL: http://${EC2_HOST}:8002
+    networks:
+      - argus-net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres-data:
   falkordb-data:
