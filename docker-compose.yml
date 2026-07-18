@@ -290,6 +290,34 @@ services:
       timeout: 5s
       retries: 5
 
+  masscan-worker:
+    image: ghcr.io/argus-scan/masscan-worker:latest
+    container_name: argus-masscan-worker
+    restart: unless-stopped
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    ports:
+      - "8007:8007"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      NATS_URL: nats://nats:4222
+      PORT: "8007"
+      MASSCAN_RATE: "1000"
+      MASSCAN_PORTS: "21,22,23,25,53,80,110,143,443,445,465,587,993,995,1433,1521,3306,3389,5432,5900,6379,8080,8443,8888,9200,27017"
+    networks:
+      - argus-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      nats:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8007/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   web:
     image: ghcr.io/argus-scan/web:latest
     container_name: argus-web
