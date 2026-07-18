@@ -140,6 +140,8 @@ services:
     image: ghcr.io/argus-scan/auth-service:latest
     container_name: argus-auth
     restart: unless-stopped
+    ports:
+      - "8001:8001"
     environment:
       DATABASE_URL: ${DATABASE_URL}
       REDIS_URL: redis://:${REDIS_PASSWORD}@falkordb:6379/0
@@ -155,7 +157,7 @@ services:
       falkordb:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8001/health | grep -q ok"]
+      test: ["CMD-SHELL", "nc -z localhost 8001 || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -169,6 +171,8 @@ services:
     image: ghcr.io/argus-scan/scan-orchestrator:latest
     container_name: argus-scan-orchestrator
     restart: unless-stopped
+    ports:
+      - "8002:8002"
     environment:
       DATABASE_URL: ${DATABASE_URL}
       NATS_URL: nats://nats:4222
@@ -182,7 +186,7 @@ services:
       nats:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://localhost:8002/health | grep -q ok"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8002/health')"]
       interval: 10s
       timeout: 5s
       retries: 5
